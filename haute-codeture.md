@@ -75,13 +75,14 @@ What's the point of type checking if anything can either be what it claims to
 be, or a bomb that crashes your program? 
 
 I'm referring, of course, to `null`, `NULL`, `None`, `0`: the "billion dollar
-mistake".  Seriously, the guy who invented it calls it that (
-https://en.wikipedia.org/wiki/Tony_Hoare#Apologies_and_retractions ). To quote
-him (Hoare):
+mistake".  Seriously, the guy who invented it calls it that
+(https://en.wikipedia.org/wiki/Tony_Hoare#Apologies_and_retractions). To wit:
 
 > This has led to innumerable errors, vulnerabilities, and system crashes,
 > which have probably caused a billion dollars of pain and damage in the last
 > forty years.
+>
+> &mdash;<cite>Tony Hoare</cite>
 
 `NullPointerException`s and segmentation faults are commonplace in the extreme.
 "NPE when I cast 'Intimidating Shout'" fills our bugbases and "can this argument
