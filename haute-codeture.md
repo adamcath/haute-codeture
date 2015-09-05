@@ -63,7 +63,7 @@ static typechecking if anything can either be what it claims to be, or a bomb
 that crashes your program? 
 
 I'm referring, of course, to `null`: the "billion dollar mistake". Seriously,
-the guy who introduced `null` to object-oriented languages calls it that
+the guy who introduced `null` to object-oriented languages [calls it that]
 (https://en.wikipedia.org/wiki/Tony_Hoare#Apologies_and_retractions). To wit:
 
 > This [(`null`)] has led to innumerable errors, vulnerabilities, and system
