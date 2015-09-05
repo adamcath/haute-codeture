@@ -110,4 +110,5 @@ and a single-digit number of NPE's, I'm convinced. The real *feng shui* happens
 when your whole codebase eschews `null`, but even if you only use it in one
 function, you've made that function better. 
 
-![One year of NullPointerExceptions in production](/year-of-npes.png?raw=true "One year of `NullPointerExceptions` in production")
+![One year of NullPointerExceptions in production](/year-of-npes.png?raw=true)
+*One year of `NullPointerExceptions` in production"*
