@@ -62,7 +62,7 @@ and static types. Now you didn't have to remember where everything was and how
 it was stored. Instead, there were a set of names that were in scope at any
 given time, and their types were right there in the code, next to the names. Not
 only that, but the compiler would check that nobody passed you a BroadSword when
-you expected a RayGun. What an victory for coding productivity!
+you expected a RayGun. What a victory for productivity!
 
 But there's a loophole in Java (and most mainstream statically typed languages).
 If you ask for a RayGun, you might get a RayGun...or you might get nothing. If
@@ -74,15 +74,15 @@ Wednesday" and then whispering "or I might punch you in the face instead".
 What's the point of type checking if anything can either be what it claims to
 be, or a bomb that crashes your program? 
 
-I'm referring, of course, to `null`, `NULL`, `None`, `0`: the "billion dollar
-mistake".  Seriously, the guy who invented it calls it that
+I'm referring, of course, to `null`: the "billion dollar mistake". Seriously,
+the guy who introduced `null` to object-oriented languages calls it that
 (https://en.wikipedia.org/wiki/Tony_Hoare#Apologies_and_retractions). To wit:
 
-> This has led to innumerable errors, vulnerabilities, and system crashes,
-> which have probably caused a billion dollars of pain and damage in the last
-> forty years.
+> This [(`null`)] has led to innumerable errors, vulnerabilities, and system
+> crashes, which have probably caused a billion dollars of pain and damage in
+> the last forty years.
 >
-> &mdash;<cite>Tony Hoare</cite>
+> &mdash; *Tony Hoare*
 
 `NullPointerException`s and segmentation faults are commonplace in the extreme.
 "NPE when I cast 'Intimidating Shout'" fills our bugbases and "can this argument
@@ -109,3 +109,5 @@ after seeing a big codebase run in production with for 2 years of high volume
 and a single-digit number of NPE's, I'm convinced. The real *feng shui* happens
 when your whole codebase eschews `null`, but even if you only use it in one
 function, you've made that function better. 
+
+!(year-of-npes.png "One year of `NullPointerExceptions` in production")
