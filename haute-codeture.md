@@ -47,32 +47,16 @@ public Optional<RayGun> loadRayGun(int id) {
 }
 ```
 
-##### A brief history of static typing
-
-Back in the day, people wrote in assembly languages. Put this in a register,
-shift that register onto the stack, add the two top stack frames and put it in
-this register, et cetera. This basically sucked. One of the numerous problems
-was that you had to keep track of what types of things were stored where.
-Register 17 has an 16-bit floating point number. Register 4 has a 32-bit
-two's-complement integer. The 3rd stack element contains the address of a byte
-of memory which contains the first ASCII character in a null-terminated string.
-
-That was super annoying to remember, so we invented named variables, functions,
-and static types. Now you didn't have to remember where everything was and how
-it was stored. Instead, there were a set of names that were in scope at any
-given time, and their types were right there in the code, next to the names. Not
-only that, but the compiler would check that nobody passed you a BroadSword when
-you expected a RayGun. What a victory for productivity!
-
-But there's a loophole in Java (and most mainstream statically typed languages).
-If you ask for a RayGun, you might get a RayGun...or you might get nothing. If
-you say you'll return a Ponycorn to your caller, you have to return a
-Ponycorn...or you can just go ahead and return a special value that *looks* like
-a Ponycorn, but, if your caller tries to use it, will crash her program. What
-the hell, guys! It's like your boss saying "I'll give you your paycheck on
-Wednesday" and then whispering "or I might punch you in the face instead".
-What's the point of type checking if anything can either be what it claims to
-be, or a bomb that crashes your program? 
+There's this loophole in Java, and most mainstream statically typed languages
+(this one doesn't really apply to dynamic languages). If you ask for a RayGun,
+you might get a RayGun&hellip;or you might get nothing. If you say you'll
+return a Ponycorn to your caller, you have to return a Ponycorn&hellip;or you
+can just go ahead and return a special value that *looks* like a Ponycorn, but,
+if your caller tries to use it, will crash her program.  What the hell! It's
+like your boss saying "I'll give you your paycheck on Wednesday" and then
+muttering "or I might punch you in the face instead". What's the point of
+static typechecking if anything can either be what it claims to be, or a bomb
+that crashes your program? 
 
 I'm referring, of course, to `null`: the "billion dollar mistake". Seriously,
 the guy who introduced `null` to object-oriented languages calls it that
@@ -91,8 +75,8 @@ be `null`?" peppers our code reviews. It's time to stop this madness.
 ##### `Optional` to the rescue
 
 The best solution is to use a programming language that forces you to be
-explicit about the possible absence of a value, but just using Guava's
-`Optional` is a surprisingly good comprimise. 
+explicit about the possible absence of a value, but Guava's `Optional` is a
+surprisingly good comprimise. 
 
 If you may return a `RayGun` or maybe not, declare your return type as
 `Optional<RayGun>`. Your callers won't have to wonder whether you're giving them
