@@ -29,7 +29,7 @@ No:
 ```
 public RayGun loadRayGun(int id) {
     Rowset rows = db.query("SELECT ...");
-    if (rows.isEmpty()){
+    if (rows.isEmpty()) {
         return null;
     }
     return rows.get(0);
@@ -40,7 +40,7 @@ Yes:
 ```
 public Optional<RayGun> loadRayGun(int id) {
     Rowset rows = db.query("SELECT ...");
-    if (rows.isEmpty()){
+    if (rows.isEmpty()) {
         return Optional.absent();
     }
     return Optional.of(rows.get(0));
