@@ -26,7 +26,7 @@ The examples are in Java but the rules apply to many languages.
 #### Never take or return `null`. Use `Optional` instead.
 
 No:
-```
+```java
 public RayGun loadRayGun(int id) {
     Rowset rows = db.query("SELECT ...");
     if (rows.isEmpty()) {
@@ -37,7 +37,7 @@ public RayGun loadRayGun(int id) {
 ```
 
 Yes:
-```
+```java
 public Optional<RayGun> loadRayGun(int id) {
     Rowset rows = db.query("SELECT ...");
     if (rows.isEmpty()) {
