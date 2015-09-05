@@ -25,6 +25,8 @@ The examples are in Java but the rules apply to many languages.
 
 #### Never take or return `null`. Use `Optional` instead.
 
+##### Example
+
 No:
 ```java
 public RayGun loadRayGun(int id) {
@@ -46,6 +48,8 @@ public Optional<RayGun> loadRayGun(int id) {
     return Optional.of(rows.get(0));
 }
 ```
+
+##### Rationale
 
 There's this loophole in Java, and most mainstream statically typed languages
 (this one doesn't really apply to dynamic languages). If you ask for a RayGun,
@@ -87,12 +91,18 @@ Never take `null`, either. If you have an optional argument, then declare it as
 `Optional<Quadcopter>`. See, it even reads nice! (You can also overload the
 function with one that doesn't take that argument). 
 
-You may be skeptical. It might seem like boilerplate, or like chaining together
-a bunch of optional method calls would be annoying. I too was skeptical, but
-after seeing a big codebase run in production with for 2 years of high volume
-and a single-digit number of NPE's, I'm convinced. The real *feng shui* happens
-when your whole codebase eschews `null`, but even if you only use it in one
-function, you've made that function better. 
+Of course, nothing stops you from passing `null` where `Optional<Quadcopter>` is
+declared. But only an asshole would do that, and most of our colleagues aren't
+assholes (if they are, deal with that first). And once you develop your `null`
+allergy, you'll quickly spot this in code reviews.
+
+You may be skeptical. It might seem like boilerplate. You might worry that
+chaining together a bunch of optional method calls would be annoying. I too was
+skeptical, but after seeing a big codebase run in production with for 2 years of
+high volume with a single-digit number of NPE's, I'm convinced. The real *feng
+shui* happens when your whole codebase eschews `null`. Only then will your
+beaten-dog reflex to null-check everything start to fade. But even if you only
+use `Optional` in one function, you've made that function better. 
 
 ![One year of NullPointerExceptions in production](/year-of-npes.png?raw=true)
 *One year of `NullPointerException`s in production*
