@@ -14,3 +14,20 @@ it was stored. Instead, there were a set of names that were in scope at any
 given time, and their types were right there in the code, next to the names. Not
 only that, but the compiler would check that nobody passed you a BroadSword when
 you expected a RayGun. What a victory for productivity!
+
+
+
+
+#### Use immutable objects
+
+
+#### Use `@ThreadSafe` and `@NotThreadSafe` a lot
+
+
+
+
+## Rules for long-term flexibility
+
+#### Only use `static` fields for immutable literals. Never use `SomeClass.getInstance()`.
+
+#### Never share a module called `*-utils` between two processes or teams

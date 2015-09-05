@@ -21,11 +21,9 @@ high-style guide for code.
 
 The examples are in Java but the rules apply to many languages.
 
-## The rules
+## Rules for preventing bugs
 
 #### Never take or return `null`. Use `Optional` instead.
-
-##### Example
 
 No:
 ```java
@@ -106,3 +104,71 @@ use `Optional` in one function, you've made that function better.
 
 ![One year of NullPointerExceptions in production](/year-of-npes.png?raw=true)
 *One year of `NullPointerException`s in production*
+
+
+
+## Rules for effective collaboration
+
+#### Never check in `TODO`s
+
+No:
+```java
+// TODO: this may be a security hole.
+```
+
+Yes:
+```java
+// This may be a security hole. Bug DEATHSTAR-4231 tracks this.
+```
+... along with a bug in the bugbase.
+
+##### Rationale
+
+Sometimes we don't want to do every conceivable thing right now. Sometimes we're
+cutting corners to hit a deadline, or you're just pretty sure this thermal
+exhaust port is small enough that nobody could possibly fire a proton torpedo
+into it. So you whip out a Light Sharpie and scribble a quick `TODO` on the
+exhaust port so you don't forget to come back to it.
+
+But maybe you didn't come back to it, and maybe there was a small security
+breach. You get hauled before the emperor. "Why didn't you tell anyone about
+this?", he demands. "Well, I wrote a `TODO` so I'd come back and fix it!"
+This would not end well for you.
+
+##### Out of sight, out of mind
+
+How can you remember to do something when your only reminder is buried in
+thousands of lines of code?
+
+The solution is simple. File a ticket. Then you'll prioritize the ticket during
+you're normal planning processes. Reference it in the code so surprised readers
+know it's tracked. If the ticket would just be too embarassing ("fix glaring
+security hole"), you should probably just fix it now.
+
+
+#### Never check in commented-out or unused code
+
+No:
+```
+// stetsonHat.doth()
+```
+
+Yes:
+```
+```
+
+Code is a message from its writers to its future maintainers. What message does
+commented-out code send? The most common is "this is how it used to work". Well,
+that's what source control history is for. Really. If I want to know how it used
+to work, I will look in `git log`. The commented-out code is clutter, and I
+always wonder if I'm supposed to keep it working when I'm changing things near
+it.
+
+Or are you trying to tell me "this is *not* how it works". Thanks, guy!
+
+Dead (unused) code is just as bad. What are you saying? "This is how it might
+work some day"? Sounds like a `TODO`. File a ticket.
+
+There is one marginally acceptable usage: "uncomment this to run against a local
+database". But use it judiciously, and don't expect anyone to keep it "working"
+for you. You may need to make it a supported, configurable behavior.
