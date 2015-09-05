@@ -23,7 +23,7 @@ The examples are in Java but the rules apply to many languages.
 
 ## The rules
 
-### Never take or return `null`. Use `Optional` instead.
+#### Never take or return `null`. Use `Optional` instead.
 
 No:
 ```
@@ -47,7 +47,7 @@ public Optional<RayGun> loadRayGun(int id) {
 }
 ```
 
-#### A brief history of static typing
+##### A brief history of static typing
 
 Back in the day, people wrote in assembly languages. Put this in a register,
 shift that register onto the stack, add the two top stack frames and put it in
@@ -87,7 +87,7 @@ him (Hoare):
 "NPE when I cast 'Intimidating Shout'" fills our bugbases and "can this argument
 be `null`?" peppers our code reviews. It's time to stop this madness.
 
-#### Optional to the rescue
+##### `Optional` to the rescue
 
 The best solution is to use a programming language that forces you to be
 explicit about the possible absence of a value, but just using Guava's
