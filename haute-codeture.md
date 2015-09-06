@@ -16,10 +16,15 @@ a low level of abstraction: where curly braces go, how to capitalize things, and
 other lexical or syntactic details. I wanted a new kind of style guide that
 helps you avoid bugs and write *semantically* readable code.
 
-This is a style guide that operates on a higher level of abstraction. A
+The strength of style guides is that they use simple rules that are easy to
+follow. This is a style guide that operates on a higher level of abstraction; a
 high-style guide for code.
 
-The examples are in Java but the rules apply to many languages.
+The examples are in Java but the rules apply to many languages (especially those 
+with static type-checking).
+
+
+
 
 ## Rules for preventing bugs
 
@@ -49,16 +54,15 @@ public Optional<RayGun> loadRayGun(int id) {
 
 ##### Rationale
 
-There's this loophole in Java, and most mainstream statically typed languages
-(this one doesn't really apply to dynamic languages). If you ask for a RayGun,
-you might get a RayGun&hellip;or you might get nothing. If you say you'll
-return a Ponycorn to your caller, you have to return a Ponycorn&hellip;or you
-can just go ahead and return a special value that *looks* like a Ponycorn, but,
-if your caller tries to use it, will crash her program.  What the hell! It's
-like your boss saying "I'll give you your paycheck on Wednesday" and then
-muttering "or I might punch you in the face instead". What's the point of
-static typechecking if anything can either be what it claims to be, or a bomb
-that crashes your program? 
+There's this loophole in Java, and most mainstream statically typed languages.
+If you ask for a RayGun, you might get a RayGun&hellip;or you might get nothing.
+If you say you'll return a Ponycorn to your caller, you have to return a
+Ponycorn&hellip;or you can just go ahead and return a special value that *looks*
+like a Ponycorn, but, if your caller tries to use it, will crash her program.
+What the hell! It's like your boss saying "I'll give you your paycheck on
+Wednesday" and then muttering "or I might punch you in the face instead". What's
+the point of static typechecking if anything can either be what it claims to be,
+or a bomb that crashes your program? 
 
 I'm referring, of course, to `null`: the "billion dollar mistake". Seriously,
 the guy who introduced `null` to object-oriented languages [calls it that]
@@ -106,6 +110,72 @@ use `Optional` in one function, you've made that function better.
 *One year of `NullPointerException`s in production*
 
 
+#### Use immutable value objects
+
+No:
+```
+Shirt shirt = shirtStore.loadShirt("adam");
+shirt.setColor("red");
+shirt.save();
+```
+
+Yes:
+```
+Shirt shirt = shirtStore.loadShirt();
+Shirt.Builder builder = shirt.toBuilder();
+Shirt newShirt = builder.withColor("red").build();
+shirtStore.updateShirt("adam", newShirt);
+```
+
+No:
+```
+Wardrobe wardrobe = wardrobeStore.loadWardrobe();
+wardrobe.addShirt(shirt);
+wardrobe.save();
+```
+
+Yes:
+```
+Wardrobe wardrobe = wardrobeStore.loadWardrobe();
+newWardrobe = wardrobeStore.addShirt(wardrobe, shirt);
+```
+
+This one is more of a design pattern than a hard rule.
+
+##### Rationale
+
+Much has been said about the benefits of immutability in programming. I
+particularly like Rich Hickey's (creator of Clojure) talk [The Value of Values]
+(https://www.youtube.com/watch?v=-6BsiVyC1kM). I'll focus on a few practical
+benefits of this pattern in Java.
+
+Ideally, when we read code, it leaves no open questions. The semantics are
+completely clear from the code. `1 + 2` is pretty unambiguous in Java. As things
+get more complex, we have to work harder to make them obvious. `setColor` is so
+common that most of us are numb to the ambiguity, but if you think about it, it
+leaves many important questions open:
+
+- If I call it, will it update the database right now? Do I call something else
+  to persist it?
+- If somebody else stashed a reference to it, are they gonna see my change?
+- Is `Shirt` thread-safe? When will other threads see my mutations?
+- What if these other actors act on the new version before I've persisted it?
+  And what if the save call fails? Do I need to think about rolling them back?
+
+A different approach would be to say: you can't mutate a `Shirt` in memory (use
+final). If you want to change it, you make yourself a new `Shirt`, and then
+persist it. The compiler now restricts you to semantically obvious usages. You
+can share `Shirt` instances, but nobody will see each other's changes unless you
+explicitly share a new instance. You can make all the `Shirt`s you like, but the
+DB will see it iff you call a `persist()` method.
+
+The second example above demonstrates how to deal with relationships.
+
+By the way, making all these Builder classes in Java is a real pain. If anyone
+has ideas on how make that easier, I'd love to hear them.
+
+
+
 
 ## Rules for effective collaboration
 
@@ -133,7 +203,8 @@ exhaust port so you don't forget to come back to it.
 But maybe you didn't come back to it, and maybe there was a small security
 breach. You get hauled before the emperor. "Why didn't you tell anyone about
 this?", he demands. "Well, I wrote a `TODO` so I'd come back and fix it!"
-This would not end well for you.
+Lightening starts to shoot from the emperor's hands and you feel a mysterious
+tightening around your neck&hellip;
 
 ##### Out of sight, out of mind
 

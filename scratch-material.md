@@ -17,8 +17,8 @@ you expected a RayGun. What a victory for productivity!
 
 
 
+#### Use `final`
 
-#### Use immutable objects
 
 
 #### Use `@ThreadSafe` and `@NotThreadSafe` a lot
