@@ -197,16 +197,17 @@ Yes:
 ##### Rationale
 
 Sometimes we don't want to do every conceivable thing right now. Sometimes we're
-cutting corners to hit a deadline, or you're just pretty sure this thermal
-exhaust port is small enough that nobody could possibly fire a proton torpedo
-into it. So you whip out a Light Sharpie and scribble a quick `TODO` on the
-exhaust port so you don't forget to come back to it.
+cutting corners to hit a deadline; sometimes you're just pretty sure this
+thermal exhaust port is too small to fire a proton torpedo into. So you whip out
+a Light Sharpie and scribble a quick `TODO` on the exhaust port so you don't
+forget to come back to it.
 
 But maybe you didn't come back to it, and maybe there was a small security
 breach. You get hauled before the emperor. "Why didn't you tell anyone about
-this?", he demands. "Well, I wrote a `TODO` so I'd come back and fix it!"
-Lightening starts to shoot from the emperor's hands and you feel a mysterious
-tightening around your neck&hellip;
+this?" he demands. You stammer something about writing a `TODO`, but then
+getting interrupted to repair a trash compactor. Lightening begins to spark from
+the emperor's hands and you feel a mysterious tightening around your
+neck&hellip;
 
 ##### Out of sight, out of mind
 
