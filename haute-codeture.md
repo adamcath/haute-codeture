@@ -236,10 +236,10 @@ Code is a message from its writers to its future maintainers. What message does
 commented-out code send? The most common is "this is how it used to work". Well,
 that's what source control history is for. Really. If I want to know how it used
 to work, I will look in `git log`. The commented-out code is clutter, and I
-always wonder if I'm supposed to keep it working when I'm changing things near
+always wonder if I'm supposed to keep it "working" when I'm changing things near
 it.
 
-Or are you trying to tell me "this is *not* how it works". Thanks, guy!
+Or are you trying to tell me "this is *not* how it works"? Thanks, guy!
 
 Dead (unused) code is just as bad. What are you saying? "This is how it might
 work some day"? Sounds like a `TODO`. File a ticket.
