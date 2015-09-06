@@ -215,7 +215,7 @@ How can you remember to do something when your only reminder is buried in
 thousands of lines of code?
 
 The solution is simple. File a ticket. Then you'll prioritize the ticket during
-you're normal planning processes. Reference it in the code so surprised readers
+your normal planning processes. Reference it in the code so surprised readers
 know it's tracked. If the ticket would just be too embarassing ("fix glaring
 security hole"), you should probably just fix it now.
 
