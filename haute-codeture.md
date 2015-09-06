@@ -28,7 +28,7 @@ with static type-checking).
 
 ## Rules for preventing bugs
 
-#### Never take or return `null`. Use `Optional` instead.
+### Never take or return `null`. Use `Optional` instead.
 
 No:
 ```java
@@ -110,7 +110,7 @@ use `Optional` in one function, you've made that function better.
 *One year of `NullPointerException`s in production*
 
 
-#### Use immutable value objects
+### Use immutable value objects
 
 No:
 ```
@@ -179,7 +179,7 @@ has ideas on how make that easier, I'd love to hear them.
 
 ## Rules for effective collaboration
 
-#### Never check in `TODO`s
+### Never check in `TODO`s
 
 No:
 ```java
@@ -217,7 +217,7 @@ know it's tracked. If the ticket would just be too embarassing ("fix glaring
 security hole"), you should probably just fix it now.
 
 
-#### Never check in commented-out or unused code
+### Never check in commented-out or unused code
 
 No:
 ```
