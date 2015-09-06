@@ -107,7 +107,8 @@ beaten-dog reflex to null-check everything start to fade. But even if you only
 use `Optional` in one function, you've made that function better. 
 
 ![One year of NullPointerExceptions in production](/year-of-npes.png?raw=true)
-*One year of `NullPointerException`s in production*
+*One year of `NullPointerException`s in our production app. How does your graph
+look?*
 
 ---
 
