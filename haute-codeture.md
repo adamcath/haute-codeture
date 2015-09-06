@@ -109,6 +109,7 @@ use `Optional` in one function, you've made that function better.
 ![One year of NullPointerExceptions in production](/year-of-npes.png?raw=true)
 *One year of `NullPointerException`s in production*
 
+---
 
 ### Use immutable value objects
 
@@ -216,6 +217,7 @@ you're normal planning processes. Reference it in the code so surprised readers
 know it's tracked. If the ticket would just be too embarassing ("fix glaring
 security hole"), you should probably just fix it now.
 
+---
 
 ### Never check in commented-out or unused code
 
