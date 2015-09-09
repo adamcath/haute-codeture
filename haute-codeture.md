@@ -18,7 +18,8 @@ helps you avoid bugs and write *semantically* readable code.
 
 The strength of style guides is that they use simple rules that are easy to
 follow. This is a style guide that operates on a higher level of abstraction; a
-high-style guide for code.
+high-style guide for code. I hope you'll forgive me the pretension in the name
+of a little fun.
 
 The examples are in Java but the rules apply to many languages (especially those 
 with static type-checking).
@@ -112,6 +113,97 @@ look?*
 
 ---
 
+### Aside: give State its proper respect
+
+The next several rules pertain to the careful management of state. By state, I
+mean the stuff that changes over the lifetime of the program. State is what
+gives computers a time dimension; it's the difference between your code, sitting
+intert on the page, and your running program, crunching numbers and writing to
+databases.
+
+State is also a tremendous source of bugs in programming, because it's so hard
+to reason about when looking at that inert page. Questions like "can this be
+null?" or "is subsystem X initialized by the time we get here?" or "is this
+class thread-safe?" are all questions about what states can be reached at what
+times. So it behooves us to treat state with care; rather than smattering our
+program with ever-changing values that interact, we should define abstractions
+that encapsulate state changes behind an easy-to-reason-about interface.
+
+---
+
+### Try to make every instance field `final`
+
+No:
+```java
+public class Haberdashery {
+    private DbConn conn;
+    private ShipmentManager shipmentMgr;
+    private int maxPendingOrders;
+    private List<Order> pendingOrders;
+    private Order lastOrder;
+
+    public Haberdashery(...) {
+        // initialize some stuff but maybe defer others 
+    }
+}
+```
+
+Yes:
+```java
+private class Haberdashery {
+    // Configuration
+    private final DbConn conn;
+    private final ShipmentManager shipmentMgr;
+    private final int maxPendingOrders;
+
+    // State
+    private final List<Order> pendingOrders;
+    private Order lastOrder;
+
+    public Haberdashery(...) {
+        // initialize everything
+    }
+```
+
+This change dramatically reduces the number of states your class can be in. It
+renders moot a whole class of questions like:
+
+- Is it possible to have a `DbConn` but no `ShipmentManager`? You only need to
+  look in the constructor to see how they're initialized (and if you're
+  following "never return `null`", it's even more obvious that you always have
+  both of these). 
+- Is it possible for one thread to change `maxPendingOrders` while another is
+  about to throw `TooManyOrdersException`? Nope, `maxPendingOrders` it never
+  changes.
+
+In general, you'll find that readers just don't have to worry too much about an
+all-final configuration section. Those are your dependencies, which are always
+configured during construction, and that's really all there is to say about
+them.
+
+The real action is in the state section. Now the reader can focus on questions
+that matter, like:
+
+- Is access to `pendingOrders` synchronized in some way?
+- Is `lastOrder == pendingOrders.get(pendingOrders.size() - 1)`? How do we
+  enforce that? And why do we store both anyway?
+
+Note that we made `pendingOrders` final even though it's mutable state. Why? So
+nobody has to wonder whether, in addition to mutating the list, we also change
+the reference to a new list. Answer: the compiler won't let me.
+
+Implementing this change is easy. Any time you don't plan on changing a field,
+declare it final. Consider whether it's part of the mutable state of the class
+or the immutable configuration and put it in the appropriate section.
+
+---
+
+### Don't use `static` state
+
+
+### Don't use the `Singleton.getInstance()` pattern
+
+
 ### Use immutable value objects
 
 No:
@@ -167,9 +259,10 @@ leaves many important questions open:
 A different approach would be to say: you can't mutate a `Shirt` in memory (use
 final). If you want to change it, you make yourself a new `Shirt`, and then
 persist it. The compiler now restricts you to semantically obvious usages. You
-can share `Shirt` instances, but nobody will see each other's changes unless you
-explicitly share a new instance. You can make all the `Shirt`s you like, but the
-DB will see it iff you call a `persist()` method.
+can share `Shirt` instances, but it's obvious (since all the fields are final)
+that nobody will see each other's changes unless you explicitly share a new
+instance. You can make all the `Shirt`s you like, but the DB will see it iff you
+call a `persist()` method.
 
 The second example above demonstrates how to deal with relationships.
 
