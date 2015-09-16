@@ -395,9 +395,9 @@ Yes:
 
 Sometimes we don't want to do every conceivable thing right now. Sometimes we're
 cutting corners to hit a deadline; sometimes you're just pretty sure this
-thermal exhaust port is too small to fire a proton torpedo into. So you whip out
-a Light Sharpie and scribble a quick `TODO` on the exhaust port so you don't
-forget to come back to it.
+thermal exhaust port is too small to fire a proton (TODO sp?) torpedo into. So
+you whip out a Death Sharpie and scribble a quick `TODO` on the exhaust port so
+you don't forget to come back to it.
 
 But maybe you didn't come back to it, and maybe there was a small security
 breach. You get hauled before the emperor. "Why didn't you tell anyone about
@@ -439,7 +439,8 @@ it.
 Or are you trying to tell me "this is *not* how it works"? Thanks, guy!
 
 Dead (unused) code is just as bad. What are you saying? "This is how it might
-work some day"? Sounds like a `TODO`. File a ticket.
+work some day"? Sounds like a `TODO` (see "never check in TODOs"). File a
+ticket.
 
 There is one marginally acceptable usage: "uncomment this to run against a local
 database". But use it judiciously, and don't expect anyone to keep it "working"
