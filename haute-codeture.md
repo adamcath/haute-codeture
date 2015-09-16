@@ -21,8 +21,10 @@ follow. This is a style guide that operates on a higher level of abstraction; a
 high-style guide for code. I hope you'll forgive me the pretension in the name
 of a little fun.
 
-The examples are in Java but the rules apply to many languages (especially those 
-with static type-checking).
+Like all style guides, the points are not meant to be irrefutable; sometimes
+they resolve arbitary decisions arbitrarily. But when taken together, they yield
+a codebase with some nice properties. The examples are in Java but the rules
+apply to many languages (especially those with static type-checking).
 
 
 
@@ -111,6 +113,13 @@ use `Optional` in one function, you've made that function better.
 *One year of `NullPointerException`s in our production app. How does your graph
 look?*
 
+This is most relevant in languages like Java, where we pass strongly-typed
+references around constantly and don't think much about pointers. The risk of
+NPEs is high in these languages because passing typed references works great 99%
+of the time. In languages with weaker type systems or manual memory management,
+we must always consult the docs or the code to understand the semantics of
+passed references, so we end up being more paranoid.
+
 ---
 
 ### Aside: give State its proper respect
@@ -198,12 +207,6 @@ or the immutable configuration and put it in the appropriate section.
 
 ---
 
-### Don't use `static` state
-
-
-### Don't use the `Singleton.getInstance()` pattern
-
-
 ### Use immutable value objects
 
 No:
@@ -269,6 +272,107 @@ The second example above demonstrates how to deal with relationships.
 By the way, making all these Builder classes in Java is a real pain. If anyone
 has ideas on how make that easier, I'd love to hear them.
 
+---
+
+### Don't use the `Singleton.getInstance()` pattern
+
+No:
+```java
+public class Haberdashery {
+    public Order createOrder(Customer c) {
+        DbConn.getInstance().query("INSERT INTO orders...");
+        ShipmentManager.getInstance().createShipment(c.address, ...);
+    }
+}
+```
+
+Yes:
+```java
+public class Haberdashery {
+    // Configuration
+    private final DbConn conn;
+    private final ShipmentManager shipmentMgr;
+
+    @Inject
+    public Haberdashery(DbConn conn, ShipmentManager shipmentMgr) {
+        this.conn = conn;
+        this.shipmentMgr = shipmentMgr;
+    }
+
+    public Order createOrder(Customer c) {
+        conn.query("INSERT INTO orders...");
+        shipmentManager.createShipment(c.address, ...);
+    }
+}
+
+@Singleton
+public class ShipmentManager {
+    ...
+}
+```
+
+Yes:
+```java
+public class Haberdashery {
+    public Order createOrder(Customer c,
+                             DbConn conn, 
+                             ShipmentManager shipmentMgr) { 
+        ... 
+    }
+}
+```
+
+The static singleton pattern, which is ubiquitous in Java, has some significant,
+practical drawbacks:
+
+1. The fact that these classes are singletons is encoded in every single client
+   call. If you ever needed to change that, you're going to have to update a lot
+   of code. I once worked on an editor where the document model was a singleton.
+   Then we added tabs. Good times were not had.
+2. It's very difficult to write a unit test for `Haberdashery` without
+   implicitly testing `DbConn` and `ShipmentManager`, since there's no place the
+   test can insert mock versions of those objects. See "write unit tests"
+   (TODO).
+3. Careful management of dependencies is our best tool for creating high-level
+   structure in large systems, and this pattern makes it impossible for a reader
+   to enumerate everything that this class depends on without reading every line
+   of code. 
+4. It permits some annoying questions: when is the earliest time I can safely
+   call `getInstance()`? Will it return the same thing every time? Is it
+   thread-safe? I have seen bugs created by all of these potholes. We'd like to
+   make those questions irrelevant.
+
+The preferred solution is to use dependency injection to pass each class's
+dependencies into its constructor. If you don't know about dependency injection
+yet, just watch [this video](TODO) from Google. The "yes" solution above solves
+all these problems:
+
+1. The fact that `ShipmentManager` is a singleton is encoded in one place: its
+   own class declaration. If we needed multiple `ShipmentManager`s, we wouldn't
+   have to touch `Haberdashery`.
+2. To unit test `Haberdashery`, we can create mock versions of its dependencies
+   (using a mock framework like EasyMock or by using an interface and writing an
+   alternative implementation).
+3. `Haberdashery`'s dependencies are clearly stated in its constructor, so we
+   can tell at a glance how it fits in to our overall system. Classes with too
+   many dependencies can be spotted trivially (even through automated static
+   analysis).
+4. `getInstance()` is replaced with an argument passed to the constructor once,
+   so none of the open questions apply.
+
+In fairness, dependency injection does have some downsides. Instantiation of
+most of the long-lived objects in your program gets done by the framework.
+Usually this is extremely convenient, but it is magical and can be a hard to
+debug when something goes wrong (missing a `@Singleton` annotation? Your class
+may get instantiated many times!). And you are giving up tight control over
+instantiation order. Again, usually that is a welcome relief from a tedious and
+error-prone task, but some may find it uncomfortable.
+
+An alternative is to pass the dependencies into the method that needs them. This
+is appropriate when the codebase you're working in doesn't use dependency
+injection and you think it's too disruptive to add it, when the dependencies
+aren't available at startup-time (`DbConn` may very well be like this), or
+if you just prefer this style.
 
 
 

@@ -23,6 +23,7 @@ you expected a RayGun. What a victory for productivity!
 
 #### Use `@ThreadSafe` and `@NotThreadSafe` a lot
 
+### In fact, never store state in a `static` field
 
 
 
