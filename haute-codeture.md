@@ -113,6 +113,8 @@ use `Optional` in one function, you've made that function better.
 *One year of `NullPointerException`s in our production app. How does your graph
 look?*
 
+#### Exceptions
+
 This is most relevant in languages like Java, where we pass strongly-typed
 references around constantly and don't think much about pointers. The risk of
 NPEs is high in these languages because passing typed references works great 99%
@@ -204,6 +206,11 @@ the reference to a new list. Answer: the compiler won't let me.
 Implementing this change is easy. Any time you don't plan on changing a field,
 declare it final. Consider whether it's part of the mutable state of the class
 or the immutable configuration and put it in the appropriate section.
+
+#### Exceptions
+
+Part of your program is actually the mutable state. That part can't be final
+(although you can often use a final reference to a mutable object).
 
 ---
 
@@ -322,7 +329,9 @@ public class Haberdashery {
 }
 ```
 
-The static singleton pattern, which is ubiquitous in Java, has some significant,
+#### Rationale
+
+The static singleton pattern, which is ubiquitous in Java, has significant
 practical drawbacks:
 
 1. The fact that these classes are singletons is encoded in every single client
@@ -339,8 +348,11 @@ practical drawbacks:
    of code. 
 4. It permits some annoying questions: when is the earliest time I can safely
    call `getInstance()`? Will it return the same thing every time? Is it
-   thread-safe? I have seen bugs created by all of these potholes. We'd like to
-   make those questions irrelevant.
+   thread-safe? What if there are multiple classloaders in play? I have seen
+   bugs created by all of these potholes. We'd like to make those questions
+   irrelevant.
+
+#### Explicit dependency management
 
 The preferred solution is to use dependency injection to pass each class's
 dependencies into its constructor. If you don't know about dependency injection
@@ -368,11 +380,97 @@ may get instantiated many times!). And you are giving up tight control over
 instantiation order. Again, usually that is a welcome relief from a tedious and
 error-prone task, but some may find it uncomfortable.
 
-An alternative is to pass the dependencies into the method that needs them. This
-is appropriate when the codebase you're working in doesn't use dependency
-injection and you think it's too disruptive to add it, when the dependencies
-aren't available at startup-time (`DbConn` may very well be like this), or
-if you just prefer this style.
+#### Exceptions
+
+Sometimes the codebase you're working in doesn't use dependency injection and
+you think it's too disruptive to add it, or the dependencies aren't available at
+startup-time (`DbConn` may very well be like this), or if you just don't like
+dependency injection. In those cases, you can pass the dependencies into the
+method that needs them. 
+
+---
+
+### In fact, never store state in static fields
+
+No:
+```java
+public class Shipment {
+    /** Cache of currently outstanding shipments */
+    private static final Map<String, Shipment> shipmentsById = new HashMap<>();
+
+    public static void register(Shipment s) {
+        shipmentsById.put(s.id, s);
+    }
+}
+
+public class Haberdashery {
+    public Order createOrder(Customer c) {
+        ...
+        Shipment s = shipmentStore.createShipment(c.address, ...);
+        Shipment.register(s);
+        ...
+    }
+}
+```
+
+Yes:
+```java
+/**
+ * Contains all outstanding shipments. This is used to optimize the delivery 
+ * subsystem.
+ */
+public class ShipmentCache {
+    private final Map<String, Shipment> shipmentsById = new HashMap<>();
+
+    public void register(Shipment s) {
+        shipmentsById.put(s.id, s);
+    }
+}
+
+public class Haberdashery {
+    private final ShipmentCache shipmentCache;
+
+    public Haberdashery(ShipmentCache shipmentCache, ...) {
+        this.shipmentCache = shipmentCache;
+        ...
+    }
+
+    public Order createOrder(Customer c) {
+        Shipment s = shipmentStore.createShipment(c.address, ...);
+        shipmentCache.register(s);
+        ...
+    }
+}
+```
+
+#### Rationale
+
+Go read the rule "don't use the `Singleton.getInstance()` pattern", and then
+come back and try to spot the problem with static fields. Static fields are like
+fields of an implicit singleton: the class object!
+`Singleton.getInstance().frobnicate()` is the same as `Singleton.frobnicate()`,
+and it has the exact same drawbacks around flexibility, unit-testability,
+discoverability, and semantic ambiguity.
+
+#### Model everything
+
+Static fields usually indicate that there is some object in the program that
+hasn't been modeled yet. In my example, `Shipment.shipmentsById` was actually an
+in-memory cache of shipments that are also represented in the database. If we
+need such a thing, we should admit it to ourselves by creating an
+`ShipmentCache` and passing it around. This solves the practical problems
+(testability, etc) and also makes the program more understandable because we've
+modeled each distinct entity as an object. The ideal of object-oriented
+programming is a set of objects interacting with each other; this fix gets us
+one step closer.
+
+#### Exceptions
+
+Note that I'm not talking about constants (`Math.PI`) or static functions
+(`Math.max()`). Those are fine because they're sort of timeless; `max()` always
+means the same thing no matter what. No need to have an instance of something to
+compute `max()`.
+
 
 
 
