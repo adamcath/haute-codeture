@@ -492,9 +492,9 @@ public class HaberdasheryTest {
             .query("SELECT COUNT(1) FROM orders")
             .getRow(0).getColumn("count").asInt();
 
-        // Fill up the shipment manager, but disable it first to fix race condition
-        // in test
-        app.getShipmentManager().pauseAllShipments();
+        // Fill up the shipment manager, but disable it first to prevent race 
+        // condition in test
+        app.getShipmentManager().pauseAllShipmentsForTesting();
         for (int i = 0; i < ShipmentManager.MAX_OUTSTANDING_SHIPMENTS; i++) {
             app.getHaberdashery().createOrder(...);
         }
@@ -516,6 +516,10 @@ public class HaberdasheryTest {
 
         // Note: I made this case mercifully simple for readability.
         // In real life it gets a lot uglier.
+
+        // Note: getDbConnForTesting() and pauseAllShipmentsForTesting() 
+        // were written, and must be maintained, explicitly to make these 
+        // tests possible.
     }
 }
 ```
@@ -541,6 +545,7 @@ public class HaberdasheryTest {
         // ...the txn should get rolled back...
         EasyMock.expect(dbConn.rollbackTransaction());
 
+        // (ok, we're ready to test)
         EasyMock.replay(dbConn, shipmentManager);
 
         // ...and Haberdashery should throw
@@ -551,6 +556,7 @@ public class HaberdasheryTest {
             // great!
         }
 
+        // (did everything we expected to happen happen?)
         EasyMock.verify(dbConn, shipmentManager);
 
         // Note: in pratice there are a few tricks to make it read even cleaner
@@ -581,14 +587,11 @@ that", then I'm about to change your life.
 If you answered no, then you already get it and you can skip this one. Or you
 don't have any tests, and you're fired.
 
-"Automated tests" are any tests that are not run manually. "Functional test" is
-such an overloaded term we just stop using it.
-
-"Unit tests" test one class (or similar unit of structure) at a time. They do
-this by mocking, or faking, all the other classes with which that class
-interacts. The structure of a unit test is "given that my class depends on
-objects x, y, z, and assuming they behave like this, when I call this method on
-my class, it should return this, and have these side-effects on my dependencies.
+"Unit tests" test one class (or equivalent) at a time. They do this by
+"mocking", or faking, all the other classes with which that class interacts. The
+structure of a unit test is "given that my class depends on objects x, y, z, and
+assuming they behave like this, when I call this method on my class, it should
+return this, and have these side-effects on my dependencies."
 
 Because we are mocking x, y, z, we can easily put the system in any state we
 need to in order to exercise the class under test. We don't need to fill up the
@@ -600,11 +603,12 @@ Twitter to test how our app behaves when it gets a 500 from the Twitter API.
 suppose a system has `N` classes, each with up to `S` states. If we wanted to
 exercise the whole system, we would need `S^N` tests.  Adding a new class with
 two states would require *doubling* the test suite, because we should really
-test every state of the existing classes against both of the new states.
+test every previous state of the system with each of the new states.
 
-But wait. Most of those classes really don't care about our two new states.
-`TwitterClient` probably doesn't care what state the `Haberdashery` is in. If
-most classes are independent, how many tests do we need for total coverage?
+But wait &emdash; most of those classes really don't care about our two new
+states.  `TwitterClient` probably doesn't care what state the `Haberdashery` is
+in. If most classes are independent, how many tests do we need for total
+coverage?
 
 Generally speaking, a class can only access its own stuff, the global stuff, and
 any stuff its direct dependencies expose. So if we could put all that stuff in
@@ -628,8 +632,7 @@ computations. And computation is really fast and really reliable. No more tests
 failing because ports are in use, files are locked, or PIDs are exausted. No
 more test running for hours and then crapping out because the DB went down. No
 more not really being able to tell what a test tests because there is so much
-set-up boilerplate. No more thinking that 100% branch coverage is an absurd
-pipe-dream.
+set-up. No more thinking that 100% coverage is an absurd pipe-dream.
 
 Unit tests reinforce many of the other recommendations in this style guide. They
 discourage statics and singletons because they're hard to mock. They reward
