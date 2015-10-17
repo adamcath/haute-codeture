@@ -26,8 +26,12 @@ they resolve arbitary decisions arbitrarily. But when taken together, they yield
 a codebase with some nice properties. The examples are in Java but the rules
 apply to many languages (especially those with static type-checking).
 
+---
 
+# Contents
+@@TOC@@
 
+---
 
 ### Never take or return `null`. Use `Optional` instead.
 
