@@ -274,7 +274,7 @@ By the way, making all these Builder classes in Java is a real pain. If anyone
 has ideas on how make that easier, I'd love to hear them.
 
 
-## <a name="nosingletons"></a>Don't use the `Singleton.getInstance()` pattern
+## Don't use the `Singleton.getInstance()` pattern
 
 No:
 ```java
@@ -333,8 +333,8 @@ practical drawbacks:
    Then we added tabs. Good times were not had.
 2. It's very difficult to write a unit test for `Haberdashery` without
    implicitly testing `DbConn` and `ShipmentManager`, since there's no place the
-   test can insert mock versions of those objects. See [write unit
-   tests](#writeunittests).
+   test can insert mock versions of those objects. See 
+   [write unit tests](#make-sure-you-actually-know-what-unit-tests-are-and-write-them).
 3. Careful management of dependencies is our best tool for creating high-level
    structure in large systems, and this pattern makes it impossible for a reader
    to enumerate everything that this class depends on without reading every line
@@ -437,9 +437,9 @@ public class Haberdashery {
 
 #### Rationale
 
-Go re-read [Don't use the `Singleton.getInstance()` pattern](#nosingletons), and
-then come back and try to spot the problem with static fields. Static fields are
-like fields of an implicit singleton: the class object!
+Go re-read [Don't use the `Singleton.getInstance()` pattern](#dont-use-the-singletongetinstance-pattern), 
+and then come back and try to spot the problem with static fields. Static fields
+are like fields of an implicit singleton: the class object!
 `Singleton.getInstance().frobnicate()` is very much like
 `Singleton.frobnicate()`, and it has the exact same drawbacks around
 flexibility, unit-testability, discoverability, and semantic ambiguity.
@@ -464,7 +464,7 @@ thing no matter what. No need to have an instance of something to compute
 `max()`.
 
 
-## <a name="writeunittests"></a>Make sure you actually know what unit tests are, and write them
+## Make sure you actually know what unit tests are, and write them
 
 No:
 ```java
@@ -722,7 +722,7 @@ it.
 Or are you trying to tell me "this is *not* how it works"? Thanks, guy!
 
 Dead (unused) code is just as bad. What are you saying? "This is how it might
-work some day"? Sounds like a `TODO` (see "never check in TODOs"). File a
+work some day"? [Sounds like a `TODO`](#never-check-in-todos). File a
 ticket.
 
 There is one marginally acceptable usage: "uncomment this to run against a local
