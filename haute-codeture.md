@@ -486,6 +486,12 @@ public class HaberdasheryTest {
     @Test
     public void createOrderWhenThereAreTooManyOutstandingShipmentsShouldFail() {
 
+        // Check # of orders in DB first so we can assert that it hasn't 
+        // changed at end, since txn gets aborted
+        int nOrdersBefore = app.getDbConnForTesting()
+            .query("SELECT COUNT(1) FROM orders")
+            .getRow(0).getColumn("count").asInt();
+
         // Fill up the shipment manager, but disable it first to fix race condition
         // in test
         app.getShipmentManager().pauseAllShipments();
@@ -500,6 +506,13 @@ public class HaberdasheryTest {
         } catch (TooManyOrdersException e) {
             // great!
         }
+
+        // Ensure the DB is unchanged
+        int nOrdersAfter = app.getDbConnForTesting()
+            .query("SELECT COUNT(1) FROM orders")
+            .getRow(0).getColumn("count").asInt();
+        
+        assertEquals(nOrdersBefore, nOrdersAfter);
 
         // Note: I made this case mercifully simple for readability.
         // In real life it gets a lot uglier.
