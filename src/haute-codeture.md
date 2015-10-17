@@ -26,13 +26,11 @@ they resolve arbitary decisions arbitrarily. But when taken together, they yield
 a codebase with some nice properties. The examples are in Java but the rules
 apply to many languages (especially those with static type-checking).
 
----
 
 # Contents
 
 @@TOC@@
 
----
 
 ## Never take or return `null`. Use `Optional` instead.
 
@@ -125,7 +123,6 @@ of the time. In languages with weaker type systems or manual memory management,
 we must always consult the docs or the code to understand the semantics of
 passed references, so we end up being more paranoid.
 
----
 
 ## Aside: give State its proper respect
 
@@ -143,7 +140,6 @@ times. So it behooves us to treat state with care; rather than smattering our
 program with ever-changing values that interact, we should define abstractions
 that encapsulate state changes behind an easy-to-reason-about interface.
 
----
 
 ## Try to make every instance field `final`
 
@@ -210,7 +206,6 @@ Implementing this change is easy. Any time you don't plan on changing a field,
 declare it final. Consider whether it's part of the mutable state of the class
 or the immutable configuration and put it in the appropriate section.
 
----
 
 ## Use immutable value objects
 
@@ -278,7 +273,6 @@ The second example above demonstrates how to deal with relationships.
 By the way, making all these Builder classes in Java is a real pain. If anyone
 has ideas on how make that easier, I'd love to hear them.
 
----
 
 ## <a name="nosingletons"></a>Don't use the `Singleton.getInstance()` pattern
 
@@ -387,7 +381,6 @@ startup-time (`DbConn` may very well be like this), or you just don't like the
 magic of dependency injection. In those cases, you can pass the dependencies
 into the method that needs them like the second example.
 
----
 
 ## Never store state in static fields
 
@@ -470,7 +463,6 @@ Those are fine because they're sort of timeless; `max()` always means the same
 thing no matter what. No need to have an instance of something to compute
 `max()`.
 
----
 
 ## <a name="writeunittests"></a>Make sure you actually know what unit tests are, and write them
 
@@ -670,7 +662,6 @@ than the other kind, and infinitely easier to get good coverage. If you're using
 Java, look at EasyMock (stay away from PowerMock initially) or Mockito. You will
 also likely want to use Google Guice for dependency injection.
 
----
 
 ## Never check in `TODO`s
 
@@ -709,7 +700,6 @@ your normal planning processes. Reference it in the code so surprised readers
 know it's tracked. If the ticket would just be too embarassing ("fix glaring
 security hole"), you should probably just fix it now.
 
----
 
 ## Never check in commented-out or unused code
 
