@@ -26,7 +26,6 @@ they resolve arbitary decisions arbitrarily. But when taken together, they yield
 a codebase with some nice properties. The examples are in Java but the rules
 apply to many languages (especially those with static type-checking).
 
----
 
 # Contents<span id="contents"></span>
 
@@ -41,7 +40,6 @@ apply to many languages (especially those with static type-checking).
     - [Never check in `TODO`s](#never-check-in-todos)
     - [Never check in commented-out or unused code](#never-check-in-commented-out-or-unused-code)
 
----
 
 ## Never take or return `null`. Use `Optional` instead.<span id="never-take-or-return-null-use-optional-instead"></span>
 
@@ -134,7 +132,6 @@ of the time. In languages with weaker type systems or manual memory management,
 we must always consult the docs or the code to understand the semantics of
 passed references, so we end up being more paranoid.
 
----
 
 ## Aside: give State its proper respect<span id="aside-give-state-its-proper-respect"></span>
 
@@ -152,7 +149,6 @@ times. So it behooves us to treat state with care; rather than smattering our
 program with ever-changing values that interact, we should define abstractions
 that encapsulate state changes behind an easy-to-reason-about interface.
 
----
 
 ## Try to make every instance field `final`<span id="try-to-make-every-instance-field-final"></span>
 
@@ -219,7 +215,6 @@ Implementing this change is easy. Any time you don't plan on changing a field,
 declare it final. Consider whether it's part of the mutable state of the class
 or the immutable configuration and put it in the appropriate section.
 
----
 
 ## Use immutable value objects<span id="use-immutable-value-objects"></span>
 
@@ -287,7 +282,6 @@ The second example above demonstrates how to deal with relationships.
 By the way, making all these Builder classes in Java is a real pain. If anyone
 has ideas on how make that easier, I'd love to hear them.
 
----
 
 ## <a name="nosingletons"></a>Don't use the `Singleton.getInstance()` pattern<span id="a-namenosingletonsadont-use-the-singletongetinstance-pattern"></span>
 
@@ -396,7 +390,6 @@ startup-time (`DbConn` may very well be like this), or you just don't like the
 magic of dependency injection. In those cases, you can pass the dependencies
 into the method that needs them like the second example.
 
----
 
 ## Never store state in static fields<span id="never-store-state-in-static-fields"></span>
 
@@ -479,7 +472,6 @@ Those are fine because they're sort of timeless; `max()` always means the same
 thing no matter what. No need to have an instance of something to compute
 `max()`.
 
----
 
 ## <a name="writeunittests"></a>Make sure you actually know what unit tests are, and write them<span id="a-namewriteunittestsamake-sure-you-actually-know-what-unit-tests-are-and-write-them"></span>
 
@@ -679,7 +671,6 @@ than the other kind, and infinitely easier to get good coverage. If you're using
 Java, look at EasyMock (stay away from PowerMock initially) or Mockito. You will
 also likely want to use Google Guice for dependency injection.
 
----
 
 ## Never check in `TODO`s<span id="never-check-in-todos"></span>
 
@@ -718,7 +709,6 @@ your normal planning processes. Reference it in the code so surprised readers
 know it's tracked. If the ticket would just be too embarassing ("fix glaring
 security hole"), you should probably just fix it now.
 
----
 
 ## Never check in commented-out or unused code<span id="never-check-in-commented-out-or-unused-code"></span>
 
