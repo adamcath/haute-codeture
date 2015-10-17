@@ -479,20 +479,21 @@ public class HaberdasheryTest {
     public void setup() {
         app = new MenswearApp().run();
         // Connects to the DB with settings pulled from a config file
-        // whose default location is hard-coded
+        // whose default location is hard-coded, or worse, pulled from
+        // an environment variable.
     }
 
     @Test
     public void createOrderWhenThereAreTooManyOutstandingShipmentsShouldFail() {
 
-        // fill up the shipment manager - disable it first to fix race condition
+        // Fill up the shipment manager, but disable it first to fix race condition
         // in test
         app.getShipmentManager().pauseAllShipments();
         for (int i = 0; i < ShipmentManager.MAX_OUTSTANDING_SHIPMENTS; i++) {
             app.getHaberdashery().createOrder(...);
         }
 
-        // the next order should throw
+        // The next order should throw
         try {
             app.getHaberdashery().createOrder(...);
             fail("Should have thrown");
@@ -500,7 +501,7 @@ public class HaberdasheryTest {
             // great!
         }
 
-        // Note, I made this case mercifully simple for readability.
+        // Note: I made this case mercifully simple for readability.
         // In real life it gets a lot uglier.
     }
 }
@@ -510,7 +511,7 @@ Yes:
 ```java
 public class HaberdasheryTest {
     
-    @Test(expected = TooManyOrdersException.class)
+    @Test
     public void createOrderWhenThereAreTooManyOutstandingShipmentsShouldFail() {
 
         // Haberdashery should start a txn and create an order
@@ -524,9 +525,12 @@ public class HaberdasheryTest {
         EasyMock.expect(shipmentManager.createShipment(...))
                 .andThrow(new TooManyShipmentsException());
 
+        // ...the txn should get rolled back...
+        EasyMock.expect(dbConn.rollbackTransaction());
+
         EasyMock.replay(dbConn, shipmentManager);
 
-        // ...then Haberdashery should throw
+        // ...and Haberdashery should throw
         try {
             new Haberdashery(dbConn, shipmentManager).createOrder(...);
             fail("Should have thrown");
@@ -536,7 +540,7 @@ public class HaberdasheryTest {
 
         EasyMock.verify(dbConn, shipmentManager);
 
-        // In pratice there are a few tricks to make it read even cleaner
+        // Note: in pratice there are a few tricks to make it read even cleaner
         // (e.g. startic import EasyMock), omitted for clarity to n00bs.
     }
 }
