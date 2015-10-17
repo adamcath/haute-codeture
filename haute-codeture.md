@@ -182,7 +182,7 @@ renders moot a whole class of questions like:
   following "never return `null`", it's even more obvious that you always have
   both of these). 
 - Is it possible for one thread to change `maxPendingOrders` while another is
-  about to throw `TooManyOrdersException`? Nope, `maxPendingOrders` it never
+  about to throw `TooManyOrdersException`? Nope, `maxPendingOrders` never
   changes.
 
 In general, you'll find that readers just don't have to worry too much about an
@@ -204,11 +204,6 @@ the reference to a new list. Answer: the compiler won't let me.
 Implementing this change is easy. Any time you don't plan on changing a field,
 declare it final. Consider whether it's part of the mutable state of the class
 or the immutable configuration and put it in the appropriate section.
-
-#### Exceptions
-
-Part of your program is actually the mutable state. That part can't be final
-(although you can often use a final reference to a mutable object).
 
 ---
 
@@ -259,18 +254,19 @@ leaves many important questions open:
 
 - If I call it, will it update the database right now? Do I call something else
   to persist it?
-- If somebody else stashed a reference to it, are they gonna see my change?
+- If somebody else stashed a reference to the shirt, are they gonna see my
+  change?
 - Is `Shirt` thread-safe? When will other threads see my mutations?
 - What if these other actors act on the new version before I've persisted it?
-  And what if the save call fails? Do I need to think about rolling them back?
+  And what if the save call fails? Does it roll back the in-memory change too?
 
 A different approach would be to say: you can't mutate a `Shirt` in memory (use
 final). If you want to change it, you make yourself a new `Shirt`, and then
 persist it. The compiler now restricts you to semantically obvious usages. You
 can share `Shirt` instances, but it's obvious (since all the fields are final)
 that nobody will see each other's changes unless you explicitly share a new
-instance. You can make all the `Shirt`s you like, but the DB will see it iff you
-call a `persist()` method.
+instance. You can make all the `Shirt`s you like, but the DB will only see it if
+you call some kind of `persist()` method.
 
 The second example above demonstrates how to deal with relationships.
 
@@ -279,7 +275,7 @@ has ideas on how make that easier, I'd love to hear them.
 
 ---
 
-### Don't use the `Singleton.getInstance()` pattern
+### <a name="nosingletons"></a>Don't use the `Singleton.getInstance()` pattern
 
 No:
 ```java
@@ -316,7 +312,7 @@ public class ShipmentManager {
 }
 ```
 
-Yes:
+Also yes:
 ```java
 public class Haberdashery {
     public Order createOrder(Customer c,
@@ -338,8 +334,8 @@ practical drawbacks:
    Then we added tabs. Good times were not had.
 2. It's very difficult to write a unit test for `Haberdashery` without
    implicitly testing `DbConn` and `ShipmentManager`, since there's no place the
-   test can insert mock versions of those objects. See "write unit tests"
-   (TODO).
+   test can insert mock versions of those objects. See [write unit
+   tests](#writeunittests).
 3. Careful management of dependencies is our best tool for creating high-level
    structure in large systems, and this pattern makes it impossible for a reader
    to enumerate everything that this class depends on without reading every line
@@ -382,13 +378,13 @@ error-prone task, but some may find it uncomfortable.
 
 Sometimes the codebase you're working in doesn't use dependency injection and
 you think it's too disruptive to add it, or the dependencies aren't available at
-startup-time (`DbConn` may very well be like this), or if you just don't like
-dependency injection. In those cases, you can pass the dependencies into the
-method that needs them. 
+startup-time (`DbConn` may very well be like this), or you just don't like the
+magic of dependency injection. In those cases, you can pass the dependencies
+into the method that needs them like the second example.
 
 ---
 
-### In fact, never store state in static fields
+### Never store state in static fields
 
 No:
 ```java
@@ -404,7 +400,7 @@ public class Shipment {
 public class Haberdashery {
     public Order createOrder(Customer c) {
         ...
-        Shipment s = shipmentStore.createShipment(c.address, ...);
+        Shipment s = createShipment(c.address, ...);
         Shipment.register(s);
         ...
     }
@@ -434,7 +430,7 @@ public class Haberdashery {
     }
 
     public Order createOrder(Customer c) {
-        Shipment s = shipmentStore.createShipment(c.address, ...);
+        Shipment s = createShipment(c.address, ...);
         shipmentCache.register(s);
         ...
     }
@@ -443,12 +439,12 @@ public class Haberdashery {
 
 #### Rationale
 
-Go read the rule "don't use the `Singleton.getInstance()` pattern", and then
-come back and try to spot the problem with static fields. Static fields are like
-fields of an implicit singleton: the class object!
-`Singleton.getInstance().frobnicate()` is the same as `Singleton.frobnicate()`,
-and it has the exact same drawbacks around flexibility, unit-testability,
-discoverability, and semantic ambiguity.
+Go re-read [Don't use the `Singleton.getInstance()` pattern](#nosingletons), and
+then come back and try to spot the problem with static fields. Static fields are
+like fields of an implicit singleton: the class object!
+`Singleton.getInstance().frobnicate()` is very much like
+`Singleton.frobnicate()`, and it has the exact same drawbacks around
+flexibility, unit-testability, discoverability, and semantic ambiguity.
 
 #### Model everything
 
@@ -464,14 +460,89 @@ one step closer.
 
 #### Exceptions
 
-Note that I'm not talking about constants (`Math.PI`) or static functions
-(`Math.max()`). Those are fine because they're sort of timeless; `max()` always
-means the same thing no matter what. No need to have an instance of something to
-compute `max()`.
+I'm not talking about constants (`Math.PI`) or pure functions (`Math.max()`).
+Those are fine because they're sort of timeless; `max()` always means the same
+thing no matter what. No need to have an instance of something to compute
+`max()`.
 
 ---
 
-### Make sure you actually know what unit tests are, then write them
+### <a name="writeunittests"></a>Make sure you actually know what unit tests are, and write them
+
+No:
+```java
+public class HaberdasheryTest {
+    
+    private MenswearApp app;
+
+    @Before
+    public void setup() {
+        app = new MenswearApp().run();
+        // Connects to the DB with settings pulled from a config file
+        // whose default location is hard-coded
+    }
+
+    @Test
+    public void createOrderWhenThereAreTooManyOutstandingShipmentsShouldFail() {
+
+        // fill up the shipment manager - disable it first to fix race condition
+        // in test
+        app.getShipmentManager().pauseAllShipments();
+        for (int i = 0; i < ShipmentManager.MAX_OUTSTANDING_SHIPMENTS; i++) {
+            app.getHaberdashery().createOrder(...);
+        }
+
+        // the next order should throw
+        try {
+            app.getHaberdashery().createOrder(...);
+            fail("Should have thrown");
+        } catch (TooManyOrdersException e) {
+            // great!
+        }
+
+        // Note, I made this case mercifully simple for readability.
+        // In real life it gets a lot uglier.
+    }
+}
+```
+
+Yes:
+```java
+public class HaberdasheryTest {
+    
+    @Test(expected = TooManyOrdersException.class)
+    public void createOrderWhenThereAreTooManyOutstandingShipmentsShouldFail() {
+
+        // Haberdashery should start a txn and create an order
+        DbConn dbConn = EasyMock.createMock(DbConn.class);
+        EasyMock.expect(dbConn.beginTransaction());
+        EasyMock.expect(dbConn.query("INSERT INTO orders..."))
+                .andReturn(QueryResult.OK);
+
+        // But if shipment manager says too many shipments...
+        ShipmentManager shipmentManager = EasyMock.createMock(ShipmentManager.class);
+        EasyMock.expect(shipmentManager.createShipment(...))
+                .andThrow(new TooManyShipmentsException());
+
+        EasyMock.replay(dbConn, shipmentManager);
+
+        // ...then Haberdashery should throw
+        try {
+            new Haberdashery(dbConn, shipmentManager).createOrder(...);
+            fail("Should have thrown");
+        } catch (TooManyOrdersException e) {
+            // great!
+        }
+
+        EasyMock.verify(dbConn, shipmentManager);
+
+        // In pratice there are a few tricks to make it read even cleaner
+        // (e.g. startic import EasyMock), omitted for clarity to n00bs.
+    }
+}
+```
+
+#### WTF is a "unit test" anyway?
 
 I once bombed a Google interview because I couldn't give a crisp definition of
 "unit test". For many years, I used the terms "unit tests", "automated tests",
@@ -483,7 +554,7 @@ Ponder:
 * Do your tests ever fail spuriously?
 * Do your tests connect to a database?
 * Are your tests slower than 100 cases per second?
-* Do you tremble inside with the secret knowledge that there are billions of 
+* Do you tremble with the secret shame that there are billions of 
   possible states your tests don't cover?
 
 If you answered yes to any of these, your tests are almost certainly not unit
@@ -493,8 +564,8 @@ that", then I'm about to change your life.
 If you answered no, then you already get it and you can skip this one. Or you
 don't have any tests, and you're fired.
 
-"Automated tests" are any tests that are automatic. "Functional test" is such an
-overloaded term we just stop using it.
+"Automated tests" are any tests that are not run manually. "Functional test" is
+such an overloaded term we just stop using it.
 
 "Unit tests" test one class (or similar unit of structure) at a time. They do
 this by mocking, or faking, all the other classes with which that class
