@@ -34,7 +34,7 @@ apply to many languages (especially those with static type-checking).
 
 ---
 
-### Never take or return `null`. Use `Optional` instead.
+## Never take or return `null`. Use `Optional` instead.
 
 No:
 ```java
@@ -127,7 +127,7 @@ passed references, so we end up being more paranoid.
 
 ---
 
-### Aside: give State its proper respect
+## Aside: give State its proper respect
 
 The next several rules pertain to the careful management of state. By state, I
 mean the stuff that changes over the lifetime of the program. State is what
@@ -145,7 +145,7 @@ that encapsulate state changes behind an easy-to-reason-about interface.
 
 ---
 
-### Try to make every instance field `final`
+## Try to make every instance field `final`
 
 No:
 ```java
@@ -212,7 +212,7 @@ or the immutable configuration and put it in the appropriate section.
 
 ---
 
-### Use immutable value objects
+## Use immutable value objects
 
 No:
 ```
@@ -280,7 +280,7 @@ has ideas on how make that easier, I'd love to hear them.
 
 ---
 
-### <a name="nosingletons"></a>Don't use the `Singleton.getInstance()` pattern
+## <a name="nosingletons"></a>Don't use the `Singleton.getInstance()` pattern
 
 No:
 ```java
@@ -389,7 +389,7 @@ into the method that needs them like the second example.
 
 ---
 
-### Never store state in static fields
+## Never store state in static fields
 
 No:
 ```java
@@ -472,7 +472,7 @@ thing no matter what. No need to have an instance of something to compute
 
 ---
 
-### <a name="writeunittests"></a>Make sure you actually know what unit tests are, and write them
+## <a name="writeunittests"></a>Make sure you actually know what unit tests are, and write them
 
 No:
 ```java
@@ -672,7 +672,7 @@ also likely want to use Google Guice for dependency injection.
 
 ---
 
-### Never check in `TODO`s
+## Never check in `TODO`s
 
 No:
 ```java
@@ -711,7 +711,7 @@ security hole"), you should probably just fix it now.
 
 ---
 
-### Never check in commented-out or unused code
+## Never check in commented-out or unused code
 
 No:
 ```

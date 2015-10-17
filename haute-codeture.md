@@ -31,19 +31,19 @@ apply to many languages (especially those with static type-checking).
 # Contents<span id="contents"></span>
 
 - [Contents](#contents)
-        - [Never take or return `null`. Use `Optional` instead.](#never-take-or-return-null-use-optional-instead)
-        - [Aside: give State its proper respect](#aside-give-state-its-proper-respect)
-        - [Try to make every instance field `final`](#try-to-make-every-instance-field-final)
-        - [Use immutable value objects](#use-immutable-value-objects)
-        - [<a name="nosingletons"></a>Don't use the `Singleton.getInstance()` pattern](#a-namenosingletonsadont-use-the-singletongetinstance-pattern)
-        - [Never store state in static fields](#never-store-state-in-static-fields)
-        - [<a name="writeunittests"></a>Make sure you actually know what unit tests are, and write them](#a-namewriteunittestsamake-sure-you-actually-know-what-unit-tests-are-and-write-them)
-        - [Never check in `TODO`s](#never-check-in-todos)
-        - [Never check in commented-out or unused code](#never-check-in-commented-out-or-unused-code)
+    - [Never take or return `null`. Use `Optional` instead.](#never-take-or-return-null-use-optional-instead)
+    - [Aside: give State its proper respect](#aside-give-state-its-proper-respect)
+    - [Try to make every instance field `final`](#try-to-make-every-instance-field-final)
+    - [Use immutable value objects](#use-immutable-value-objects)
+    - [<a name="nosingletons"></a>Don't use the `Singleton.getInstance()` pattern](#a-namenosingletonsadont-use-the-singletongetinstance-pattern)
+    - [Never store state in static fields](#never-store-state-in-static-fields)
+    - [<a name="writeunittests"></a>Make sure you actually know what unit tests are, and write them](#a-namewriteunittestsamake-sure-you-actually-know-what-unit-tests-are-and-write-them)
+    - [Never check in `TODO`s](#never-check-in-todos)
+    - [Never check in commented-out or unused code](#never-check-in-commented-out-or-unused-code)
 
 ---
 
-### Never take or return `null`. Use `Optional` instead.<span id="never-take-or-return-null-use-optional-instead"></span>
+## Never take or return `null`. Use `Optional` instead.<span id="never-take-or-return-null-use-optional-instead"></span>
 
 No:
 ```java
@@ -136,7 +136,7 @@ passed references, so we end up being more paranoid.
 
 ---
 
-### Aside: give State its proper respect<span id="aside-give-state-its-proper-respect"></span>
+## Aside: give State its proper respect<span id="aside-give-state-its-proper-respect"></span>
 
 The next several rules pertain to the careful management of state. By state, I
 mean the stuff that changes over the lifetime of the program. State is what
@@ -154,7 +154,7 @@ that encapsulate state changes behind an easy-to-reason-about interface.
 
 ---
 
-### Try to make every instance field `final`<span id="try-to-make-every-instance-field-final"></span>
+## Try to make every instance field `final`<span id="try-to-make-every-instance-field-final"></span>
 
 No:
 ```java
@@ -221,7 +221,7 @@ or the immutable configuration and put it in the appropriate section.
 
 ---
 
-### Use immutable value objects<span id="use-immutable-value-objects"></span>
+## Use immutable value objects<span id="use-immutable-value-objects"></span>
 
 No:
 ```
@@ -289,7 +289,7 @@ has ideas on how make that easier, I'd love to hear them.
 
 ---
 
-### <a name="nosingletons"></a>Don't use the `Singleton.getInstance()` pattern<span id="a-namenosingletonsadont-use-the-singletongetinstance-pattern"></span>
+## <a name="nosingletons"></a>Don't use the `Singleton.getInstance()` pattern<span id="a-namenosingletonsadont-use-the-singletongetinstance-pattern"></span>
 
 No:
 ```java
@@ -398,7 +398,7 @@ into the method that needs them like the second example.
 
 ---
 
-### Never store state in static fields<span id="never-store-state-in-static-fields"></span>
+## Never store state in static fields<span id="never-store-state-in-static-fields"></span>
 
 No:
 ```java
@@ -481,7 +481,7 @@ thing no matter what. No need to have an instance of something to compute
 
 ---
 
-### <a name="writeunittests"></a>Make sure you actually know what unit tests are, and write them<span id="a-namewriteunittestsamake-sure-you-actually-know-what-unit-tests-are-and-write-them"></span>
+## <a name="writeunittests"></a>Make sure you actually know what unit tests are, and write them<span id="a-namewriteunittestsamake-sure-you-actually-know-what-unit-tests-are-and-write-them"></span>
 
 No:
 ```java
@@ -681,7 +681,7 @@ also likely want to use Google Guice for dependency injection.
 
 ---
 
-### Never check in `TODO`s<span id="never-check-in-todos"></span>
+## Never check in `TODO`s<span id="never-check-in-todos"></span>
 
 No:
 ```java
@@ -720,7 +720,7 @@ security hole"), you should probably just fix it now.
 
 ---
 
-### Never check in commented-out or unused code<span id="never-check-in-commented-out-or-unused-code"></span>
+## Never check in commented-out or unused code<span id="never-check-in-commented-out-or-unused-code"></span>
 
 No:
 ```
