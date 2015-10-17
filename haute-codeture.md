@@ -29,6 +29,7 @@ apply to many languages (especially those with static type-checking).
 ---
 
 # Contents<span id="contents"></span>
+
 - [Contents](#contents)
         - [Never take or return `null`. Use `Optional` instead.](#never-take-or-return-null-use-optional-instead)
         - [Aside: give State its proper respect](#aside-give-state-its-proper-respect)
