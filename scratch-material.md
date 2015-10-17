@@ -15,20 +15,6 @@ given time, and their types were right there in the code, next to the names. Not
 only that, but the compiler would check that nobody passed you a BroadSword when
 you expected a RayGun. What a victory for productivity!
 
-
-
-#### Use `final`
-
-
-
 #### Use `@ThreadSafe` and `@NotThreadSafe` a lot
-
-### In fact, never store state in a `static` field
-
-
-
-## Rules for long-term flexibility
-
-#### Only use `static` fields for immutable literals. Never use `SomeClass.getInstance()`.
 
 #### Never share a module called `*-utils` between two processes or teams

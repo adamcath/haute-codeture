@@ -29,8 +29,6 @@ apply to many languages (especially those with static type-checking).
 
 
 
-## Rules for preventing bugs
-
 ### Never take or return `null`. Use `Optional` instead.
 
 No:
@@ -55,7 +53,7 @@ public Optional<RayGun> loadRayGun(int id) {
 }
 ```
 
-##### Rationale
+#### Rationale
 
 There's this loophole in Java, and most mainstream statically typed languages.
 If you ask for a RayGun, you might get a RayGun&hellip;or you might get nothing.
@@ -71,9 +69,9 @@ I'm referring, of course, to `null`: the "billion dollar mistake". Seriously,
 the guy who introduced `null` to object-oriented languages [calls it that]
 (https://en.wikipedia.org/wiki/Tony_Hoare#Apologies_and_retractions). To wit:
 
-> This [(`null`)] has led to innumerable errors, vulnerabilities, and system
-> crashes, which have probably caused a billion dollars of pain and damage in
-> the last forty years.
+> [`Null`] has led to innumerable errors, vulnerabilities, and system crashes,
+> which have probably caused a billion dollars of pain and damage in the last
+> forty years.
 >
 > &mdash; *Tony Hoare*
 
@@ -81,7 +79,7 @@ the guy who introduced `null` to object-oriented languages [calls it that]
 "NPE when I cast 'Intimidating Shout'" fills our bugbases and "can this argument
 be `null`?" peppers our code reviews. It's time to stop this madness.
 
-##### `Optional` to the rescue
+#### `Optional` to the rescue
 
 The best solution is to use a programming language that forces you to be
 explicit about the possible absence of a value, but Guava's `Optional` is a
@@ -246,7 +244,7 @@ newWardrobe = wardrobeStore.addShirt(wardrobe, shirt);
 
 This one is more of a design pattern than a hard rule.
 
-##### Rationale
+#### Rationale
 
 Much has been said about the benefits of immutability in programming. I
 particularly like Rich Hickey's (creator of Clojure) talk [The Value of Values]
@@ -356,8 +354,8 @@ practical drawbacks:
 
 The preferred solution is to use dependency injection to pass each class's
 dependencies into its constructor. If you don't know about dependency injection
-yet, just watch [this video](TODO) from Google. The "yes" solution above solves
-all these problems:
+yet, just watch [this video](TODO) from Google (and I do recommend Google
+Guice). The "yes" solution above solves all these problems:
 
 1. The fact that `ShipmentManager` is a singleton is encoded in one place: its
    own class declaration. If we needed multiple `ShipmentManager`s, we wouldn't
@@ -471,10 +469,112 @@ Note that I'm not talking about constants (`Math.PI`) or static functions
 means the same thing no matter what. No need to have an instance of something to
 compute `max()`.
 
+---
 
+### Make sure you actually know what unit tests are, then write them
 
+I once bombed a Google interview because I couldn't give a crisp definition of
+"unit test". For many years, I used the terms "unit tests", "automated tests",
+and "functional tests" interchangably. Then my colleague Binil Thomas showed me
+what a unit test is, and it changed everything.
 
-## Rules for effective collaboration
+Ponder:
+* Do your tests launch your app?
+* Do your tests ever fail spuriously?
+* Do your tests connect to a database?
+* Are your tests slower than 100 cases per second?
+* Do you tremble inside with the secret knowledge that there are billions of 
+  possible states your tests don't cover?
+
+If you answered yes to any of these, your tests are almost certainly not unit
+tests. If you are thinking "what is he talking about? Tests are always like
+that", then I'm about to change your life.
+
+If you answered no, then you already get it and you can skip this one. Or you
+don't have any tests, and you're fired.
+
+"Automated tests" are any tests that are automatic. "Functional test" is such an
+overloaded term we just stop using it.
+
+"Unit tests" test one class (or similar unit of structure) at a time. They do
+this by mocking, or faking, all the other classes with which that class
+interacts. The structure of a unit test is "given that my class depends on
+objects x, y, z, and assuming they behave like this, when I call this method on
+my class, it should return this, and have these side-effects on my dependencies.
+
+Because we are mocking x, y, z, we can easily put the system in any state we
+need to in order to exercise the class under test. We don't need to fill up the
+hard drive to test how our class behaves when it's full. We don't need to crash
+Twitter to test how our app behaves when it gets a 500 from the Twitter API.
+
+#### To put it more formally,
+
+suppose a system has `N` classes, each with up to `S` states. If we wanted to
+exercise the whole system, we would need `S^N` tests.  Adding a new class with
+two states would require *doubling* the test suite, because we should really
+test every state of the existing classes against both of the new states.
+
+But wait. Most of those classes really don't care about our two new states.
+`TwitterClient` probably doesn't care what state the `Haberdashery` is in. If
+most classes are independent, how many tests do we need for total coverage?
+
+Generally speaking, a class can only access its own stuff, the global stuff, and
+any stuff its direct dependencies expose. So if we could put all that stuff in
+all interesting states, and pass every interesting input, we could have 100%
+state-space coverage for this class. If we add a new class but its state is
+never visible to the old class, we don't need to touch the tests for the old
+class. The tests exploit the program's orthogonality.
+
+Mocking our dependencies allows us to put them in all interering states *from
+our test class' point of view*. By passing all interesting inputs, we get total
+coverage on that class. If you do this enough, you start to think of the states
+of your dependencies as inputs, and the effects you enact on your dependencies
+as outputs, which makes the whole program feel like a pure computation, which is
+much easier to reason about than a giant state machine.
+
+#### Practical benefits
+
+If you have never worked on a codebase with a lot of unit tests, you are in for
+a treat when you try it. Because unit tests mock I/O, they are pure
+computations. And computation is really fast and really reliable. No more tests
+failing because ports are in use, files are locked, or PIDs are exausted. No
+more test running for hours and then crapping out because the DB went down. No
+more not really being able to tell what a test tests because there is so much
+set-up boilerplate. No more thinking that 100% branch coverage is an absurd
+pipe-dream.
+
+Unit tests reinforce many of the other recommendations in this style guide. They
+discourage statics and singletons because they're hard to mock. They reward
+explicit dependency management because it enables mocking. They encourage you to
+make each class an independent state machine with a limited state-space, because
+you can actually convince yourself that you have exhausted it.
+
+#### Here's the rub
+
+Even if all your unit tests pass, your program may not work at all. You can't
+really unit test main(). You can't test that you're using the right DB password.
+You can't test that the Twitter API actually returns what you think it does, and
+does so consistently.
+
+You still need the other kind of tests. Testing should be a pyramid; with a lot
+of unit tests that prove each class works, a smaller number of "component" tests
+that prove each component/process/service/module works, and a still smaller
+number of "integration", "system", or "acceptance" tests that prove the whole
+system works. From base to peak, each level should be about 10% the size of the
+previous level.
+
+Finally, unit tests are robust to small refactorings, but not to large ones; if
+you split or merge classes, you will have to do a lot of fixups on the tests.
+But at least they're fast so you can iterate quickly.
+
+#### But seriously, do it
+
+Unit test are are ridiculously worth it. They're dramatically easier to write
+than the other kind, and infinitely easier to get good coverage. If you're using
+Java, look at EasyMock (stay away from PowerMock initially) or Mockito. You will
+also likely want to use Google Guice for dependency injection.
+
+---
 
 ### Never check in `TODO`s
 
@@ -489,22 +589,21 @@ Yes:
 ```
 ... along with a bug in the bugbase.
 
-##### Rationale
+#### Rationale
 
 Sometimes we don't want to do every conceivable thing right now. Sometimes we're
 cutting corners to hit a deadline; sometimes you're just pretty sure this
-thermal exhaust port is too small to fire a proton (TODO sp?) torpedo into. So
-you whip out a Death Sharpie and scribble a quick `TODO` on the exhaust port so
-you don't forget to come back to it.
+thermal exhaust port is too small to fire a photon torpedo into. So you whip out
+a Death Sharpie and scribble a quick `TODO` on the exhaust port so you don't
+forget to come back to it.
 
 But maybe you didn't come back to it, and maybe there was a small security
-breach. You get hauled before the emperor. "Why didn't you tell anyone about
+breach. You get hauled before Vader. "Why didn't you tell anyone about
 this?" he demands. You stammer something about writing a `TODO`, but then
-getting interrupted to repair a trash compactor. Lightening begins to spark from
-the emperor's hands and you feel a mysterious tightening around your
-neck&hellip;
+getting interrupted to repair a trash compactor. You feel a mysterious tightening
+around your neck&hellip;
 
-##### Out of sight, out of mind
+#### Out of sight, out of mind
 
 How can you remember to do something when your only reminder is buried in
 thousands of lines of code?
