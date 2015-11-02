@@ -706,7 +706,7 @@ thousands of lines of code?
 
 The solution is simple. File a ticket. Then you'll prioritize the ticket during
 your normal planning processes. Reference it in the code so surprised readers
-know it's tracked. If the ticket would just be too embarassing ("fix glaring
+know it's tracked. If the ticket would just be too embarrassing ("fix glaring
 security hole"), you should probably just fix it now.
 
 
