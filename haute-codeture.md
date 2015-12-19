@@ -699,6 +699,15 @@ this?" he demands. You stammer something about writing a `TODO`, but then
 getting interrupted to repair a trash compactor. You feel a mysterious tightening
 around your neck&hellip;
 
+Don't believe this happens? [This paper](http://usenix.org/legacy/event/fast08/tech/full_papers/gunawi/gunawi_html/index.html)
+documents dozens of bugs in various filesystems in Linux 2.6. They found these
+comments near the buggy code:
+
+* CIFS: "Should we pass any errors back?"
+* IBM JFS: "Note: todo: log error handler."
+* SCSI: "Retval ignored?"
+* SCSI: "Todo: handle failure."
+
 #### Out of sight, out of mind<span id="out-of-sight-out-of-mind"></span>
 
 How can you remember to do something when your only reminder is buried in
@@ -708,7 +717,6 @@ The solution is simple. File a ticket. Then you'll prioritize the ticket during
 your normal planning processes. Reference it in the code so surprised readers
 know it's tracked. If the ticket would just be too embarrassing ("fix glaring
 security hole"), you should probably just fix it now.
-
 
 ## Never check in commented-out or unused code<span id="never-check-in-commented-out-or-unused-code"></span>
 
