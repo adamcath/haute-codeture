@@ -4,11 +4,10 @@ Haute Codeture
 A high-style guide for code (mostly Java)
 -----------------------------------------
 
-Ah, style. The topic of innumerable water-cooler conversations, religious wars,
-and Linus asshole-tearings. In my corner of the industry, we seem to have gotten
-surprisingly mature about the topic. People use standard style guides (like
-Google's), respect the style of the codebase they're working in, and defer to
-project leaders.
+Ah, style. The topic of innumerable water-cooler conversations and religious wars.
+In my corner of the industry, we seem to have gotten surprisingly mature about 
+the topic. People use standard style guides (like Google's), respect the style 
+of the codebase they're working in, and defer to project leaders.
 
 This is great progress, but I still find myself making the same comments in code
 reviews over and over. Traditional style guides help make your code readable at
